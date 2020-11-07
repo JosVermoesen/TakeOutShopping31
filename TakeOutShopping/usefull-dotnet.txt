@@ -1,0 +1,105 @@
+REDIS WINDOWS
+When the Redis-Server is started you can open a new terminal tab and use:
+redis-cli KEYS '*'
+
+This will give you a list of the keys from the command line.
+
+You can then use:
+redis-cli GET <keyvalue>
+Which will show you the value of the key. 
+
+redis-server  (to run redis)
+
+
+STEPS WE TOOK FOR DOTNET setup the project
+mkdir marshop (then cd marshop)
+dotnet new sln
+dotnet new webapi -o API
+dotnet sln add API
+dotnet sln list (for checking)
+
+CREATING CLASS LIBRARIES
+dotnet new classlib -o Core
+dotnet new classlib -o Infrastructure
+
+and add these also to our solution:
+dotnet sln add Core/
+dotnet sln add Infrastructure/
+
+SETTING DEPENDENCIES
+cd API
+dotnet add reference ../Infrastructure/ (API depends on Infrastructure)
+cd ..
+cd Infrastructure
+dotnet add reference ../Core/ (Infrastructure depends on Core)
+cd ..
+dotnet restore (at the end of all this)
+
+
+TEST THE API
+cd API
+dotnet watch run
+
+IN TERMINAL
+dotnet dev-certs https (to check certificates)
+dotnet dev-certs https -h (to get help on this)
+dotnet dev-certs https -t (to get window for generate a certificate)
+
+INSTALL EF
+dotnet tool install --global dotnet-ef (+> '--version 3.1.201' to get specific version)
+if already installed you get a message
+
+UPDATE EF (when upgrading to higher versions of dotnet cored 3.1.x !)
+Use only if already installed: dotnet tool update --global dotnet-ef
+
+
+MIGRATIONS (StoreContext)
+dotnet ef migrations add StoreInitial -p Infrastructure -s API -o Data/Migrations -c StoreContext
+
+dotnet ef migrations add SomethingEntityAdded -p Infrastructure -s API -c StoreContext
+
+MIGRATIONS (AppIdentityDbContext)
+dotnet ef migrations add IdentityInitial -p Infrastructure -s API -o Identity/Migrations -c AppIdentityDbContext
+
+
+DROPPING DATABASE
+dotnet ef database drop -p Infrastructure -s API/
+
+also
+dotnet ef database drop -p Infrastructure -s API -c StoreContext
+
+REMOVING MIGRATIONS
+dotnet ef migrations remove -p Infrastructure -s API/
+
+STRIPE WEBHOOKS (github.com/stripe/stripe-cli)
+using the Stripe CLI for testing
+on windows => 
+1. in PowerShell, install scoop:
+   iwr -useb get.scoop.sh | iex
+   and later on:
+   scoop update
+2. follow the instruction for Stripe CLI
+
+Stripe console commands used here:
+stripe login
+stripe listen
+stripe listen -f https://localhost:5001/api/payments/webhook
+or specific:
+stripe listen -f https://localhost:5001/api/payments/webhook -e payment_intent.succeeded,payment_intent.payment_failed
+
+
+
+Set ASPNETCORE_ENVIRONMENT
+
+Command prompt (or bash):
+set ASPNETCORE_ENVIRONMENT=Development 
+set ASPNETCORE_ENVIRONMENT=Production
+
+used before generating different migrations for different database engins
+
+PowerShell:
+$Env:ASPNETCORE_ENVIRONMENT = "Development"
+
+Publish:
+Inside api =>
+   dotnet publish -c Release -o ../publish

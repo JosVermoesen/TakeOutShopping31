@@ -39,12 +39,11 @@ namespace Spice.Controllers
             var claimsIdentity = (ClaimsIdentity)User.Identity;
             var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
 
-            if(claim!=null)
+            if (claim != null)
             {
                 var cnt = _db.ShoppingCart.Where(u => u.ApplicationUserId == claim.Value).ToList().Count;
                 HttpContext.Session.SetInt32(SD.ssShoppingCartCount, cnt);
             }
-
 
             return View(IndexVM);
         }
@@ -70,7 +69,7 @@ namespace Spice.Controllers
         public async Task<IActionResult> Details(ShoppingCart CartObject)
         {
             CartObject.Id = 0;
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var claimsIdentity = (ClaimsIdentity)this.User.Identity;
                 var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
@@ -79,7 +78,7 @@ namespace Spice.Controllers
                 ShoppingCart cartFromDb = await _db.ShoppingCart.Where(c => c.ApplicationUserId == CartObject.ApplicationUserId
                                                 && c.MenuItemId == CartObject.MenuItemId).FirstOrDefaultAsync();
 
-                if(cartFromDb==null)
+                if (cartFromDb == null)
                 {
                     await _db.ShoppingCart.AddAsync(CartObject);
                 }
